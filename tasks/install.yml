@@ -46,7 +46,6 @@
       retries: 5
       delay: 2
       # run_once: true # <-- this cannot be set due to multi-arch support
-      delegate_to: localhost
       check_mode: false
 
     - name: unpack prometheus binaries
@@ -55,13 +54,13 @@
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}.tar.gz"
         dest: "/tmp"
         creates: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/prometheus"
-      delegate_to: localhost
       check_mode: false
 
     - name: propagate official prometheus and promtool binaries
       copy:
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}"
         dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
+        remote_src: yes
         mode: 0755
         owner: root
         group: root
@@ -76,6 +75,7 @@
         src: "/tmp/prometheus-{{ prometheus_version }}.linux-{{ go_arch }}/{{ item }}/"
         dest: "{{ prometheus_config_dir }}/{{ item }}/"
         mode: 0644
+        remote_src: yes
         owner: root
         group: root
       with_items:
@@ -91,6 +91,7 @@
   copy:
     src: "{{ prometheus_binary_local_dir }}/{{ item }}"
     dest: "{{ _prometheus_binary_install_dir }}/{{ item }}"
+    remote_src: yes
     mode: 0755
     owner: root
     group: root
